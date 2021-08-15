@@ -1,0 +1,16 @@
+.HomeMainContainer {
+  .topContainer {
+    margin: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .logoSmall {
+      max-width: 150px;
+    }
+  }
+  .tableContainer {
+    margin: 0px 50px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+  }
+}

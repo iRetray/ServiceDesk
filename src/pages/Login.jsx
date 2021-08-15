@@ -39,6 +39,7 @@ const Login = () => {
           <Button
             type="primary"
             shape="round"
+            size="large"
             icon={<LoginOutlined />}
             onClick={verifyUserID}
           >
