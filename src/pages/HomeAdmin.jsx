@@ -14,12 +14,17 @@ import {
 } from "@ant-design/icons";
 
 import ModalAddNewUser from "../components/ModalAddNewUser";
+import ModalAddIssue from "../components/ModalAddIssue";
+
+import AppService from "../services/AppService";
 
 const { Title, Text } = Typography;
 
 const HomeAdmin = ({ history }) => {
   const [userData, setUserData] = useState(null);
+  const [incidents, setIncidents] = useState(null);
   const [isOpenModalUser, setIsOpenModalUser] = useState(false);
+  const [isOpenModalIssue, setIsOpenModalIssue] = useState(false);
 
   useEffect(() => {
     doInitialValidation();
@@ -33,39 +38,19 @@ const HomeAdmin = ({ history }) => {
       });
     } else {
       setUserData(thereIsUser);
+      getIncidents(thereIsUser);
     }
   };
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "PENDING",
-    },
-    {
-      key: "2",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SOLVED",
-    },
-    {
-      key: "3",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SCALED",
-    },
-    {
-      key: "4",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SCALED",
-    },
-  ];
+  const getIncidents = (currentUser) => {
+    AppService.getListOfIncidents(currentUser.id).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        delete response.networkCode;
+        setIncidents(response);
+      }
+    });
+  };
 
   const columns = [
     {
@@ -162,6 +147,9 @@ const HomeAdmin = ({ history }) => {
               shape="round"
               icon={<PlusOutlined />}
               style={{ marginLeft: "10px" }}
+              onClick={() => {
+                setIsOpenModalIssue(true);
+              }}
             >
               Añadir issue
             </Button>
@@ -224,7 +212,7 @@ const HomeAdmin = ({ history }) => {
         </div>
 
         <div className="tableContainer">
-          <Table dataSource={dataSource} columns={columns} pagination={false} />
+          <Table dataSource={incidents} columns={columns} pagination={false} />
         </div>
         <div style={{ height: "50px" }} />
       </div>
@@ -232,6 +220,12 @@ const HomeAdmin = ({ history }) => {
       <ModalAddNewUser
         isOpen={isOpenModalUser}
         setIsOpen={setIsOpenModalUser}
+      />
+
+      <ModalAddIssue
+        employeeId={userData?.id}
+        isOpen={isOpenModalIssue}
+        setIsOpen={setIsOpenModalIssue}
       />
     </Fragment>
   );

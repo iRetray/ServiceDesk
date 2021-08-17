@@ -1,4 +1,7 @@
 import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { ConfigProvider } from "antd";
+
+import esES from "antd/lib/locale-provider/es_ES";
 
 import Login from "./pages/Login";
 import HomeAdmin from "./pages/HomeAdmin";
@@ -10,15 +13,17 @@ import "./styles/styles.scss";
 
 const ServiceDesk = () => {
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route exact path="/" component={Login} />
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/homeAdmin" component={HomeAdmin} />
-        <Route exact path="/homeUser" component={HomeUser} />
-        <Route exact path="/newIssue" component={NewIssue} />
-      </Switch>
-    </BrowserRouter>
+    <ConfigProvider locale={esES}>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/" component={Login} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/homeAdmin" component={HomeAdmin} />
+          <Route exact path="/homeUser" component={HomeUser} />
+          <Route exact path="/newIssue" component={NewIssue} />
+        </Switch>
+      </BrowserRouter>
+    </ConfigProvider>
   );
 };
 

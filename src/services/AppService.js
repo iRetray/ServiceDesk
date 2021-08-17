@@ -34,6 +34,27 @@ class AppService {
   addNewUser = (newUser) => {
     return this.sendPOSTRequest("/customer/save", newUser);
   };
+
+  getNumberOfPendings = (employeeId, status) => {
+    return this.sendGETRequest(
+      "/incident/count-by-employee-id/?employeeId=" +
+        employeeId +
+        "&status=" +
+        status
+    );
+  };
+
+  getIncidentsType = () => {
+    return this.sendGETRequest("/incident-type/find-all");
+  };
+
+  getAllCustomers = () => {
+    return this.sendGETRequest("/customer/find-all");
+  };
+
+  saveNewIncident = (newIssue) => {
+    return this.sendPOSTRequest("/incident/save", newIssue);
+  };
 }
 
 const myService = new AppService();

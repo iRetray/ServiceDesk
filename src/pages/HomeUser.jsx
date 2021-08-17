@@ -18,6 +18,7 @@ const { Title, Text } = Typography;
 
 const HomeUser = ({ history }) => {
   const [userData, setUserData] = useState(null);
+  const [pendings, setPendings] = useState(null);
   const [incidents, setIncidents] = useState(null);
   const [isOpenModalUser, setIsOpenModalUser] = useState(false);
 
@@ -34,6 +35,7 @@ const HomeUser = ({ history }) => {
     } else {
       setUserData(thereIsUser);
       getIncidents(thereIsUser);
+      getPendingsNumber(thereIsUser);
     }
   };
 
@@ -47,36 +49,16 @@ const HomeUser = ({ history }) => {
     });
   };
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "PENDING",
-    },
-    {
-      key: "2",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SOLVED",
-    },
-    {
-      key: "3",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SCALED",
-    },
-    {
-      key: "4",
-      name: "Issue de plataforma",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mattis consequat imperdiet. Aenean sed mollis eros. Duis elementum ut ligula sed interdum. Quisque lacinia eget dolor sit amet scelerisque. Sed faucibus placerat lacus, et placerat nibh suscipit nec. Aenean sed nisi dictum nisl luctus suscipit iaculis at lacus. Aliquam rutrum tincidunt nibh, ac iaculis nulla molestie at. Phasellus pharetra, neque a vulputate maximus, massa nulla volutpat metus, vitae luctus eros turpis non ex. Morbi a fringilla tortor. Maecenas gravida vitae justo eu ornare. Sed tempus est nec lectus dapibus, at lobortis ligula placerat. Aliquam aliquet sem est. Pellentesque vel volutpat diam.",
-      state: "SCALED",
-    },
-  ];
+  const getPendingsNumber = (currentUser) => {
+    AppService.getNumberOfPendings(currentUser.id, "ACTIVE").then(
+      (response) => {
+        const isSuccess = response && response.networkCode === 200;
+        if (isSuccess) {
+          setPendings(response.incidentsNumber);
+        }
+      }
+    );
+  };
 
   const columns = [
     {
@@ -191,13 +173,13 @@ const HomeUser = ({ history }) => {
                     marginRight: "10px",
                   }}
                 >
-                  <Title level={5} style={{ marginBottom: "-5px" }}>
+                  <Title level={5} style={{ marginBottom: "-15px" }}>
                     {`${userData?.name} ${userData?.firstSurname} ${userData?.secondSurname}`}
                   </Title>
                   <span>{userData?.rolId}</span>
                 </Space>
 
-                <Badge count={1}>
+                <Badge count={pendings}>
                   <Avatar icon={<UserOutlined />} shape="circle" size="large" />
                 </Badge>
               </Space>
@@ -206,7 +188,7 @@ const HomeUser = ({ history }) => {
         </div>
 
         <div className="tableContainer">
-          <Table dataSource={dataSource} columns={columns} pagination={false} />
+          <Table dataSource={incidents} columns={columns} pagination={false} />
         </div>
         <div style={{ height: "50px" }} />
       </div>
