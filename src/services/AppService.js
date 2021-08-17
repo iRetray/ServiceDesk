@@ -2,7 +2,7 @@ import axios from "axios";
 class AppService {
   constructor() {
     axios.defaults.baseURL =
-      "http://servicedesk-env.eba-fsitwpw8.us-east-2.elasticbeanstalk.com";
+      "http://servicedeskdeploy-env.eba-egmyjwqv.us-east-2.elasticbeanstalk.com";
   }
 
   sendGETRequest = (query) => {
