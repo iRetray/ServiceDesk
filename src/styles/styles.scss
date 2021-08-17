@@ -1,2 +1,7 @@
 @import "./Login";
 @import "./Home";
+
+.ant-table-thead > tr > th {
+  font-weight: bold;
+  font-size: 15px;
+}

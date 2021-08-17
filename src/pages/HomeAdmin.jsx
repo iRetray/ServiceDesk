@@ -1,10 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { Fragment, useState, useEffect } from "react";
-import { Typography, Table, Button, Space, Popover, Badge, Avatar } from "antd";
+import {
+  Typography,
+  Table,
+  Button,
+  Space,
+  Popover,
+  Badge,
+  Avatar,
+  message,
+  Modal,
+  Select,
+} from "antd";
 import {
   PlusOutlined,
   UserAddOutlined,
-  EyeInvisibleOutlined,
   FieldTimeOutlined,
   CheckOutlined,
   ArrowUpOutlined,
@@ -19,12 +29,18 @@ import ModalAddIssue from "../components/ModalAddIssue";
 import AppService from "../services/AppService";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 const HomeAdmin = ({ history }) => {
   const [userData, setUserData] = useState(null);
   const [incidents, setIncidents] = useState(null);
   const [isOpenModalUser, setIsOpenModalUser] = useState(false);
   const [isOpenModalIssue, setIsOpenModalIssue] = useState(false);
+  const [isOpenModalEscale, setIsOpenModalEscale] = useState(false);
+
+  const [customers, setCustomers] = useState(null);
+  const [id, setId] = useState(null);
+  const [customerSelected, setCustomerSelected] = useState(null);
 
   useEffect(() => {
     doInitialValidation();
@@ -39,6 +55,7 @@ const HomeAdmin = ({ history }) => {
     } else {
       setUserData(thereIsUser);
       getIncidents(thereIsUser);
+      getCustomers();
     }
   };
 
@@ -47,16 +64,58 @@ const HomeAdmin = ({ history }) => {
       const isSuccess = response && response.networkCode === 200;
       if (isSuccess) {
         delete response.networkCode;
-        setIncidents(response);
+        setIncidents(Object.values(response));
+      }
+    });
+  };
+
+  const getCustomers = () => {
+    AppService.getAllCustomers().then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        delete response.networkCode;
+        setCustomers(Object.values(response));
+      }
+    });
+  };
+
+  const markAsResolved = (issueID) => {
+    const issueSelected = {
+      ...incidents.find((incident) => incident.id === issueID),
+      status: "DISABLED",
+      registerDate: "",
+    };
+    AppService.saveNewIncident(issueSelected).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        message.success("Issue desactivado correctamente");
+        getIncidents(userData);
+      }
+    });
+  };
+
+  const scaleIncident = () => {
+    const issueSelected = {
+      ...incidents.find((incident) => incident.id === id),
+      status: "SCALED",
+      registerDate: "",
+      employeeId: customerSelected,
+    };
+    AppService.saveNewIncident(issueSelected).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        message.success("Issue escalado correctamente");
+        getIncidents(userData);
+        setIsOpenModalEscale(false);
       }
     });
   };
 
   const columns = [
     {
-      title: "Título del issue",
-      dataIndex: "name",
-      key: "name",
+      title: "Persona asignada",
+      dataIndex: "customerName",
+      key: "customerName",
       align: "center",
       width: "20%",
     },
@@ -69,8 +128,8 @@ const HomeAdmin = ({ history }) => {
     },
     {
       title: "Estado",
-      dataIndex: "state",
-      key: "state",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       width: "15%",
       render: (state) =>
@@ -90,6 +149,15 @@ const HomeAdmin = ({ history }) => {
           >
             Solucionado
           </Button>
+        ) : state === "DISABLED" ? (
+          <Button
+            icon={<ArrowUpOutlined />}
+            shape="round"
+            type="dashed"
+            disabled={true}
+          >
+            Issue Desactivado
+          </Button>
         ) : (
           <Button
             icon={<ArrowUpOutlined />}
@@ -101,16 +169,66 @@ const HomeAdmin = ({ history }) => {
         ),
     },
     {
-      title: "Acciones",
-      dataIndex: "address",
-      key: "address",
+      title: "Escalar",
+      dataIndex: "id",
+      key: "id",
       align: "center",
       width: "15%",
-      render: () => (
-        <Button shape="round" icon={<EyeInvisibleOutlined />}>
-          Ocultar
-        </Button>
-      ),
+      render: (id) => {
+        if (
+          incidents.find((incident) => incident.id === id).status === "PENDING"
+        ) {
+          return (
+            <Button
+              icon={<ArrowUpOutlined />}
+              shape="round"
+              style={{ color: "#003a8c", backgroundColor: "#1890ff" }}
+              onClick={() => {
+                setId(id);
+                setIsOpenModalEscale(true);
+              }}
+            >
+              Escalar al area tecnica
+            </Button>
+          );
+        }
+      },
+    },
+    {
+      title: "Acciones",
+      dataIndex: "id",
+      key: "id",
+      align: "center",
+      width: "15%",
+      render: (id) => {
+        if (
+          incidents.find((incident) => incident.id === id).status === "DISABLED"
+        ) {
+          return (
+            <Button
+              icon={<ArrowUpOutlined />}
+              shape="round"
+              type="dashed"
+              disabled={true}
+            >
+              Issue Desactivado
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              shape="round"
+              icon={<CheckOutlined />}
+              style={{ color: "#135200", backgroundColor: "#52c41a" }}
+              onClick={() => {
+                markAsResolved(id);
+              }}
+            >
+              Marcar como resuelto
+            </Button>
+          );
+        }
+      },
     },
   ];
 
@@ -216,17 +334,46 @@ const HomeAdmin = ({ history }) => {
         </div>
         <div style={{ height: "50px" }} />
       </div>
-
       <ModalAddNewUser
         isOpen={isOpenModalUser}
         setIsOpen={setIsOpenModalUser}
       />
-
       <ModalAddIssue
         employeeId={userData?.id}
         isOpen={isOpenModalIssue}
         setIsOpen={setIsOpenModalIssue}
+        userData={userData}
+        getIncidents={getIncidents}
       />
+      <Modal
+        title="Basic Modal"
+        visible={isOpenModalEscale}
+        onOk={() => {
+          scaleIncident();
+        }}
+        onCancel={() => {
+          setIsOpenModalEscale(false);
+        }}
+      >
+        <Space>
+          <span>Persona del incidente:</span>
+          <Select
+            style={{ width: "150px" }}
+            placeholder="Incidente"
+            onChange={(newValue) => {
+              setCustomerSelected(newValue);
+            }}
+          >
+            {customers &&
+              Array.isArray(customers) &&
+              customers.map((customer) => (
+                <Option key={customer.id} value={customer.id}>
+                  {customer.name}
+                </Option>
+              ))}
+          </Select>
+        </Space>
+      </Modal>
     </Fragment>
   );
 };

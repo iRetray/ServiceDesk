@@ -9,12 +9,18 @@ import AppService from "../services/AppService";
 const { TextArea } = Input;
 const { Option } = Select;
 
-const ModalAddIssue = ({ employeeId, isOpen, setIsOpen }) => {
+const ModalAddIssue = ({
+  employeeId,
+  isOpen,
+  setIsOpen,
+  userData,
+  getIncidents,
+}) => {
   const [issueData, setIssueData] = useState({
     id: "",
     registerDate: "",
     description: "",
-    status: "ACTIVE",
+    status: "PENDING",
     incidentTypeId: "",
     employeeId: "",
     customerId: "",
@@ -59,6 +65,7 @@ const ModalAddIssue = ({ employeeId, isOpen, setIsOpen }) => {
       if (isSuccess) {
         setIsOpen(false);
         message.success("Issue creado correctamente");
+        getIncidents(userData);
       }
     });
   };
@@ -97,7 +104,7 @@ const ModalAddIssue = ({ employeeId, isOpen, setIsOpen }) => {
               {incidentsType &&
                 Array.isArray(incidentsType) &&
                 incidentsType.map((incident) => (
-                  <Option key={incident.id} value={incident.id}>
+                  <Option key={incident.id} value={incident.name}>
                     {incident.name}
                   </Option>
                 ))}

@@ -1,9 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { Fragment, useEffect, useState } from "react";
-import { Typography, Table, Button, Badge, Avatar, Space, Popover } from "antd";
+import {
+  Typography,
+  Table,
+  Button,
+  Badge,
+  Avatar,
+  Space,
+  Popover,
+  message,
+} from "antd";
 import {
   UserOutlined,
-  EyeInvisibleOutlined,
   FieldTimeOutlined,
   CheckOutlined,
   ArrowUpOutlined,
@@ -44,7 +52,7 @@ const HomeUser = ({ history }) => {
       const isSuccess = response && response.networkCode === 200;
       if (isSuccess) {
         delete response.networkCode;
-        setIncidents(response);
+        setIncidents(Object.values(response));
       }
     });
   };
@@ -60,11 +68,26 @@ const HomeUser = ({ history }) => {
     );
   };
 
+  const markAsResolved = (issueID) => {
+    const issueSelected = {
+      ...incidents.find((incident) => incident.id === issueID),
+      status: "DISABLED",
+      registerDate: "",
+    };
+    AppService.saveNewIncident(issueSelected).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        message.success("Issue desactivado correctamente");
+        getIncidents(userData);
+      }
+    });
+  };
+
   const columns = [
     {
-      title: "Título del issue",
-      dataIndex: "name",
-      key: "name",
+      title: "Dueño del issue",
+      dataIndex: "customerName",
+      key: "customerName",
       align: "center",
       width: "20%",
     },
@@ -77,8 +100,8 @@ const HomeUser = ({ history }) => {
     },
     {
       title: "Estado",
-      dataIndex: "state",
-      key: "state",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       width: "15%",
       render: (state) =>
@@ -98,6 +121,15 @@ const HomeUser = ({ history }) => {
           >
             Solucionado
           </Button>
+        ) : state === "DISABLED" ? (
+          <Button
+            icon={<ArrowUpOutlined />}
+            shape="round"
+            type="dashed"
+            disabled={true}
+          >
+            Issue Desactivado
+          </Button>
         ) : (
           <Button
             icon={<ArrowUpOutlined />}
@@ -110,15 +142,39 @@ const HomeUser = ({ history }) => {
     },
     {
       title: "Acciones",
-      dataIndex: "address",
-      key: "address",
+      dataIndex: "id",
+      key: "id",
       align: "center",
       width: "15%",
-      render: () => (
-        <Button shape="round" icon={<EyeInvisibleOutlined />}>
-          Ocultar
-        </Button>
-      ),
+      render: (id) => {
+        if (
+          incidents.find((incident) => incident.id === id).status === "DISABLED"
+        ) {
+          return (
+            <Button
+              icon={<ArrowUpOutlined />}
+              shape="round"
+              type="dashed"
+              disabled={true}
+            >
+              Issue Desactivado
+            </Button>
+          );
+        } else {
+          return (
+            <Button
+              shape="round"
+              icon={<CheckOutlined />}
+              style={{ color: "#135200", backgroundColor: "#52c41a" }}
+              onClick={() => {
+                markAsResolved(id);
+              }}
+            >
+              Marcar como resuelto
+            </Button>
+          );
+        }
+      },
     },
   ];
 
