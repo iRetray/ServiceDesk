@@ -41,10 +41,27 @@ const HomeAdmin = ({ history }) => {
   const [customers, setCustomers] = useState(null);
   const [id, setId] = useState(null);
   const [customerSelected, setCustomerSelected] = useState(null);
+  const [incidentsType, setIncidentsType] = useState(null);
+
+  const [incidentSelected, setIncidentSelected] = useState(null);
 
   useEffect(() => {
     doInitialValidation();
   }, [history]);
+
+  useEffect(() => {
+    getPeopleByRol();
+  }, [incidentSelected]);
+
+  const getPeopleByRol = () => {
+    AppService.getEmployeesByRol(incidentSelected).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        delete response.networkCode;
+        setCustomers(Object.values(response));
+      }
+    });
+  };
 
   const doInitialValidation = () => {
     const thereIsUser = history.location?.state?.user;
@@ -56,7 +73,18 @@ const HomeAdmin = ({ history }) => {
       setUserData(thereIsUser);
       getIncidents(thereIsUser);
       getCustomers();
+      getTypeIncidents();
     }
+  };
+
+  const getTypeIncidents = () => {
+    AppService.getIncidentsType().then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        delete response.networkCode;
+        setIncidentsType(Object.values(response));
+      }
+    });
   };
 
   const getIncidents = (currentUser) => {
@@ -355,6 +383,24 @@ const HomeAdmin = ({ history }) => {
           setIsOpenModalEscale(false);
         }}
       >
+        <Space>
+          <span>Tipo de incidente:</span>
+          <Select
+            style={{ width: "150px" }}
+            placeholder="Incidente"
+            onChange={(newValue) => {
+              setIncidentSelected(newValue);
+            }}
+          >
+            {incidentsType &&
+              Array.isArray(incidentsType) &&
+              incidentsType.map((incident) => (
+                <Option key={incident.id} value={incident.name}>
+                  {incident.name}
+                </Option>
+              ))}
+          </Select>
+        </Space>
         <Space>
           <span>Persona del incidente:</span>
           <Select

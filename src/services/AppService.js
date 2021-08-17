@@ -55,6 +55,10 @@ class AppService {
   saveNewIncident = (newIssue) => {
     return this.sendPOSTRequest("/incident/save", newIssue);
   };
+
+  getEmployeesByRol = (rolId) => {
+    return this.sendGETRequest("/employee/find-by-rol/?rolId=" + rolId);
+  };
 }
 
 const myService = new AppService();
