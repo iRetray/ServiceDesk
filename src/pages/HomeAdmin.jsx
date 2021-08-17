@@ -1,5 +1,6 @@
-import React, { Fragment } from "react";
-import { Typography, Table, Button } from "antd";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { Fragment, useState, useEffect } from "react";
+import { Typography, Table, Button, Space, Popover, Badge, Avatar } from "antd";
 import {
   PlusOutlined,
   UserAddOutlined,
@@ -7,13 +8,34 @@ import {
   FieldTimeOutlined,
   CheckOutlined,
   ArrowUpOutlined,
+  PhoneTwoTone,
+  LogoutOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 
-import logoApp from "../assets/logoImage.svg";
+import ModalAddNewUser from "../components/ModalAddNewUser";
 
 const { Title, Text } = Typography;
 
-const Home = () => {
+const HomeAdmin = ({ history }) => {
+  const [userData, setUserData] = useState(null);
+  const [isOpenModalUser, setIsOpenModalUser] = useState(false);
+
+  useEffect(() => {
+    doInitialValidation();
+  }, [history]);
+
+  const doInitialValidation = () => {
+    const thereIsUser = history.location?.state?.user;
+    if (!thereIsUser) {
+      history.push({
+        pathname: "/",
+      });
+    } else {
+      setUserData(thereIsUser);
+    }
+  };
+
   const dataSource = [
     {
       key: "1",
@@ -112,9 +134,11 @@ const Home = () => {
       <div className="HomeMainContainer">
         <div className="topContainer">
           <div style={{ display: "flex", alignItems: "center" }}>
-            <img src={logoApp} alt="" className="logoSmall" />
+            <PhoneTwoTone
+              style={{ fontSize: "50px", marginRight: "10px", margin: "10px" }}
+            />
             <div style={{ minWidth: "200px" }}>
-              <Title level={2} style={{ margin: "0px" }}>
+              <Title level={2} style={{ marginBottom: "-10px" }}>
                 Service Desk
               </Title>
               <Text>
@@ -122,19 +146,80 @@ const Home = () => {
               </Text>
             </div>
           </div>
+
           <div>
-            <Button shape="round" icon={<UserAddOutlined />} size="large">
+            <Button
+              shape="round"
+              icon={<UserAddOutlined />}
+              onClick={() => {
+                setIsOpenModalUser(true);
+              }}
+            >
               Añadir usuario
             </Button>
             <Button
               type="primary"
               shape="round"
               icon={<PlusOutlined />}
-              size="large"
               style={{ marginLeft: "10px" }}
             >
               Añadir issue
             </Button>
+          </div>
+
+          <div>
+            <Popover
+              content={
+                <Button
+                  type="primary"
+                  danger
+                  icon={<LogoutOutlined />}
+                  onClick={() => {
+                    history.push({
+                      pathname: "/",
+                      state: null,
+                    });
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
+              }
+              placement="left"
+              trigger="click"
+            >
+              <Space
+                style={{
+                  padding: "12px 15px",
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                }}
+              >
+                <Space
+                  direction="vertical"
+                  style={{
+                    gap: "0px",
+                    marginRight: "10px",
+                  }}
+                >
+                  <Title level={5} style={{ marginBottom: "-10px" }}>
+                    {`${userData?.name} ${userData?.firstSurname} ${userData?.secondSurname}`}
+                  </Title>
+                  <span>{userData?.rolId}</span>
+                </Space>
+
+                <Badge
+                  dot
+                  style={{
+                    backgroundColor: "#52c41a",
+                    width: "12px",
+                    height: "12px",
+                  }}
+                >
+                  <Avatar icon={<UserOutlined />} shape="circle" size="large" />
+                </Badge>
+              </Space>
+            </Popover>
           </div>
         </div>
 
@@ -143,8 +228,13 @@ const Home = () => {
         </div>
         <div style={{ height: "50px" }} />
       </div>
+
+      <ModalAddNewUser
+        isOpen={isOpenModalUser}
+        setIsOpen={setIsOpenModalUser}
+      />
     </Fragment>
   );
 };
 
-export default Home;
+export default HomeAdmin;

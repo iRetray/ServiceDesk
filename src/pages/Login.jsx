@@ -1,5 +1,5 @@
-import React, { Fragment, useState } from "react";
-import { Typography, Input, Space, Button } from "antd";
+import React, { Fragment, useState, useEffect } from "react";
+import { Typography, Input, Space, Button, message } from "antd";
 import { FieldNumberOutlined, LoginOutlined } from "@ant-design/icons";
 
 import AppService from "../services/AppService";
@@ -8,15 +8,34 @@ import logoApp from "../assets/logoImage.svg";
 
 const { Title } = Typography;
 
-const Login = () => {
+const Login = ({ history }) => {
   const [cedula, setCedula] = useState();
+
+  useEffect(() => {
+    history.push({
+      state: null,
+    });
+  }, [history]);
 
   const handleChange = (event) => {
     setCedula(event.target.value);
   };
 
   const verifyUserID = () => {
-    AppService.verifyUserID(cedula);
+    AppService.verifyUserID(cedula).then((response) => {
+      const isSuccess = response && response.networkCode === 200;
+      if (isSuccess) {
+        history.push({
+          pathname:
+            response.rolId === "CALL_CENTER" ? "/homeAdmin" : "homeUser",
+          state: {
+            user: response,
+          },
+        });
+      } else {
+        message.error("No se ha encontrado un usuario con la cédula indicada");
+      }
+    });
   };
 
   return (
