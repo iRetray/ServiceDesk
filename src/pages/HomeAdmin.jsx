@@ -229,6 +229,7 @@ const HomeAdmin = ({ history }) => {
                     }
                   }
                 );
+                setIncidentSelected(currentNameIncident.name);
                 setIsOpenModalEscale(true);
               }}
             >
