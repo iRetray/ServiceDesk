@@ -27,6 +27,7 @@ import ModalAddNewUser from "../components/ModalAddNewUser";
 import ModalAddIssue from "../components/ModalAddIssue";
 
 import AppService from "../services/AppService";
+import moment from "moment";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -126,8 +127,9 @@ const HomeAdmin = ({ history }) => {
     const issueSelected = {
       ...incidents.find((incident) => incident.id === id),
       status: "SCALED",
-      registerDate: "",
+      registerDate: moment().valueOf(),
       employeeId: customerSelected,
+      incidentTypeId: incidentSelected,
     };
     AppService.saveNewIncident(issueSelected).then((response) => {
       const isSuccess = response && response.networkCode === 200;
@@ -203,9 +205,10 @@ const HomeAdmin = ({ history }) => {
       align: "center",
       width: "15%",
       render: (id) => {
-        if (
-          incidents.find((incident) => incident.id === id).status === "PENDING"
-        ) {
+        const currentIncident = incidents.find(
+          (incident) => incident.id === id
+        );
+        if (currentIncident.status === "PENDING") {
           return (
             <Button
               icon={<ArrowUpOutlined />}
@@ -213,6 +216,19 @@ const HomeAdmin = ({ history }) => {
               style={{ color: "#003a8c", backgroundColor: "#1890ff" }}
               onClick={() => {
                 setId(id);
+                const currentNameIncident = incidentsType.find(
+                  (oneIncident) =>
+                    oneIncident.id === currentIncident.incidentTypeId
+                );
+                AppService.getEmployeesByRol(currentNameIncident.name).then(
+                  (response) => {
+                    const isSuccess = response && response.networkCode === 200;
+                    if (isSuccess) {
+                      delete response.networkCode;
+                      setCustomers(Object.values(response));
+                    }
+                  }
+                );
                 setIsOpenModalEscale(true);
               }}
             >
@@ -374,7 +390,7 @@ const HomeAdmin = ({ history }) => {
         getIncidents={getIncidents}
       />
       <Modal
-        title="Basic Modal"
+        title="Escalar incidente"
         visible={isOpenModalEscale}
         onOk={() => {
           scaleIncident();
@@ -382,29 +398,35 @@ const HomeAdmin = ({ history }) => {
         onCancel={() => {
           setIsOpenModalEscale(false);
         }}
+        footer={null}
       >
         <Space>
           <span>Tipo de incidente:</span>
           <Select
-            style={{ width: "150px" }}
+            style={{ width: "200px" }}
             placeholder="Incidente"
             onChange={(newValue) => {
+              console.log("cambio el select");
               setIncidentSelected(newValue);
             }}
+            value={
+              incidents?.find((incident) => incident.id === id)?.incidentTypeId
+            }
+            disabled
           >
             {incidentsType &&
               Array.isArray(incidentsType) &&
               incidentsType.map((incident) => (
-                <Option key={incident.id} value={incident.name}>
+                <Option key={incident.id} value={incident.id}>
                   {incident.name}
                 </Option>
               ))}
           </Select>
         </Space>
-        <Space>
+        <Space style={{ marginTop: "15px" }}>
           <span>Persona del incidente:</span>
           <Select
-            style={{ width: "150px" }}
+            style={{ width: "200px" }}
             placeholder="Incidente"
             onChange={(newValue) => {
               setCustomerSelected(newValue);
@@ -419,6 +441,15 @@ const HomeAdmin = ({ history }) => {
               ))}
           </Select>
         </Space>
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <Button
+            type="primary"
+            disabled={!customerSelected}
+            onClick={scaleIncident}
+          >
+            Escalar al area técnica
+          </Button>
+        </div>
       </Modal>
     </Fragment>
   );
