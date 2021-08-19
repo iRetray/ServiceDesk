@@ -55,13 +55,15 @@ const HomeAdmin = ({ history }) => {
   }, [incidentSelected]);
 
   const getPeopleByRol = () => {
-    AppService.getEmployeesByRol(incidentSelected).then((response) => {
-      const isSuccess = response && response.networkCode === 200;
-      if (isSuccess) {
-        delete response.networkCode;
-        setCustomers(Object.values(response));
-      }
-    });
+    if (incidentSelected) {
+      AppService.getEmployeesByRol(incidentSelected).then((response) => {
+        const isSuccess = response && response.networkCode === 200;
+        if (isSuccess) {
+          delete response.networkCode;
+          setCustomers(Object.values(response));
+        }
+      });
+    }
   };
 
   const doInitialValidation = () => {
@@ -216,20 +218,16 @@ const HomeAdmin = ({ history }) => {
               style={{ color: "#003a8c", backgroundColor: "#1890ff" }}
               onClick={() => {
                 setId(id);
-                const currentNameIncident = incidentsType.find(
-                  (oneIncident) =>
-                    oneIncident.id === currentIncident.incidentTypeId
-                );
-                AppService.getEmployeesByRol(currentNameIncident.name).then(
-                  (response) => {
-                    const isSuccess = response && response.networkCode === 200;
-                    if (isSuccess) {
-                      delete response.networkCode;
-                      setCustomers(Object.values(response));
-                    }
+                AppService.getEmployeesByRol(
+                  currentIncident.incidentTypeId
+                ).then((response) => {
+                  const isSuccess = response && response.networkCode === 200;
+                  if (isSuccess) {
+                    delete response.networkCode;
+                    setCustomers(Object.values(response));
                   }
-                );
-                setIncidentSelected(currentNameIncident.name);
+                });
+                setIncidentSelected(currentIncident.incidentTypeId);
                 setIsOpenModalEscale(true);
               }}
             >
@@ -349,7 +347,6 @@ const HomeAdmin = ({ history }) => {
                 <Space
                   direction="vertical"
                   style={{
-                    gap: "0px",
                     marginRight: "10px",
                   }}
                 >
@@ -375,7 +372,12 @@ const HomeAdmin = ({ history }) => {
         </div>
 
         <div className="tableContainer">
-          <Table dataSource={incidents} columns={columns} pagination={false} />
+          <Table
+            dataSource={incidents}
+            columns={columns}
+            pagination={false}
+            rowKey="id"
+          />
         </div>
         <div style={{ height: "50px" }} />
       </div>
@@ -417,8 +419,8 @@ const HomeAdmin = ({ history }) => {
           >
             {incidentsType &&
               Array.isArray(incidentsType) &&
-              incidentsType.map((incident) => (
-                <Option key={incident.id} value={incident.id}>
+              incidentsType.map((incident, indexIteration) => (
+                <Option key={indexIteration} value={incident.id}>
                   {incident.name}
                 </Option>
               ))}
@@ -435,8 +437,8 @@ const HomeAdmin = ({ history }) => {
           >
             {customers &&
               Array.isArray(customers) &&
-              customers.map((customer) => (
-                <Option key={customer.id} value={customer.id}>
+              customers.map((customer, indexIteration) => (
+                <Option key={indexIteration} value={customer.id}>
                   {customer.name}
                 </Option>
               ))}
