@@ -15,6 +15,8 @@ const ModalAddIssue = ({
   setIsOpen,
   userData,
   getIncidents,
+  customers,
+  getCustomers,
 }) => {
   const [issueData, setIssueData] = useState({
     id: "",
@@ -27,7 +29,6 @@ const ModalAddIssue = ({
   });
 
   const [incidentsType, setIncidentsType] = useState(null);
-  const [customers, setCustomers] = useState(null);
 
   useEffect(() => {
     setIssueData({
@@ -45,16 +46,6 @@ const ModalAddIssue = ({
       if (isSuccess) {
         delete response.networkCode;
         setIncidentsType(Object.values(response));
-      }
-    });
-  };
-
-  const getCustomers = () => {
-    AppService.getAllCustomers().then((response) => {
-      const isSuccess = response && response.networkCode === 200;
-      if (isSuccess) {
-        delete response.networkCode;
-        setCustomers(Object.values(response));
       }
     });
   };

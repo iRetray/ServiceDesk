@@ -4,7 +4,7 @@ import { UserAddOutlined } from "@ant-design/icons";
 
 import AppService from "../services/AppService";
 
-const ModalAddNewUser = ({ isOpen, setIsOpen }) => {
+const ModalAddNewUser = ({ isOpen, setIsOpen, getCustomers }) => {
   const [userData, setUserData] = useState({
     id: "",
     name: "",
@@ -20,6 +20,7 @@ const ModalAddNewUser = ({ isOpen, setIsOpen }) => {
       const isSuccess = response && response.networkCode === 200;
       if (isSuccess) {
         setIsOpen(false);
+        getCustomers();
         message.success("Usuario creado correctamente");
       }
     });

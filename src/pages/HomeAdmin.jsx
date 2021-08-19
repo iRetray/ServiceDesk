@@ -9,8 +9,6 @@ import {
   Badge,
   Avatar,
   message,
-  Modal,
-  Select,
 } from "antd";
 import {
   PlusOutlined,
@@ -25,12 +23,11 @@ import {
 
 import ModalAddNewUser from "../components/ModalAddNewUser";
 import ModalAddIssue from "../components/ModalAddIssue";
+import ModalScaleIncident from "../components/ModalScaleIncident";
 
 import AppService from "../services/AppService";
-import moment from "moment";
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 const HomeAdmin = ({ history }) => {
   const [userData, setUserData] = useState(null);
@@ -41,8 +38,6 @@ const HomeAdmin = ({ history }) => {
 
   const [customers, setCustomers] = useState(null);
   const [id, setId] = useState(null);
-  const [customerSelected, setCustomerSelected] = useState(null);
-  const [incidentsType, setIncidentsType] = useState(null);
 
   const [incidentSelected, setIncidentSelected] = useState(null);
 
@@ -76,18 +71,7 @@ const HomeAdmin = ({ history }) => {
       setUserData(thereIsUser);
       getIncidents(thereIsUser);
       getCustomers();
-      getTypeIncidents();
     }
-  };
-
-  const getTypeIncidents = () => {
-    AppService.getIncidentsType().then((response) => {
-      const isSuccess = response && response.networkCode === 200;
-      if (isSuccess) {
-        delete response.networkCode;
-        setIncidentsType(Object.values(response));
-      }
-    });
   };
 
   const getIncidents = (currentUser) => {
@@ -121,24 +105,6 @@ const HomeAdmin = ({ history }) => {
       if (isSuccess) {
         message.success("Issue desactivado correctamente");
         getIncidents(userData);
-      }
-    });
-  };
-
-  const scaleIncident = () => {
-    const issueSelected = {
-      ...incidents.find((incident) => incident.id === id),
-      status: "SCALED",
-      registerDate: moment().valueOf(),
-      employeeId: customerSelected,
-      incidentTypeId: incidentSelected,
-    };
-    AppService.saveNewIncident(issueSelected).then((response) => {
-      const isSuccess = response && response.networkCode === 200;
-      if (isSuccess) {
-        message.success("Issue escalado correctamente");
-        getIncidents(userData);
-        setIsOpenModalEscale(false);
       }
     });
   };
@@ -228,6 +194,7 @@ const HomeAdmin = ({ history }) => {
                   }
                 });
                 setIncidentSelected(currentIncident.incidentTypeId);
+
                 setIsOpenModalEscale(true);
               }}
             >
@@ -381,79 +348,33 @@ const HomeAdmin = ({ history }) => {
         </div>
         <div style={{ height: "50px" }} />
       </div>
+
       <ModalAddNewUser
         isOpen={isOpenModalUser}
         setIsOpen={setIsOpenModalUser}
+        getCustomers={getCustomers}
       />
+
       <ModalAddIssue
-        employeeId={userData?.id}
         isOpen={isOpenModalIssue}
         setIsOpen={setIsOpenModalIssue}
+        employeeId={userData?.id}
         userData={userData}
         getIncidents={getIncidents}
+        customers={customers}
+        getCustomers={getCustomers}
       />
-      <Modal
-        title="Escalar incidente"
-        visible={isOpenModalEscale}
-        onOk={() => {
-          scaleIncident();
-        }}
-        onCancel={() => {
-          setIsOpenModalEscale(false);
-        }}
-        footer={null}
-      >
-        <Space>
-          <span>Tipo de incidente:</span>
-          <Select
-            style={{ width: "200px" }}
-            placeholder="Incidente"
-            onChange={(newValue) => {
-              console.log("cambio el select");
-              setIncidentSelected(newValue);
-            }}
-            value={
-              incidents?.find((incident) => incident.id === id)?.incidentTypeId
-            }
-            disabled
-          >
-            {incidentsType &&
-              Array.isArray(incidentsType) &&
-              incidentsType.map((incident, indexIteration) => (
-                <Option key={indexIteration} value={incident.id}>
-                  {incident.name}
-                </Option>
-              ))}
-          </Select>
-        </Space>
-        <Space style={{ marginTop: "15px" }}>
-          <span>Persona del incidente:</span>
-          <Select
-            style={{ width: "200px" }}
-            placeholder="Incidente"
-            onChange={(newValue) => {
-              setCustomerSelected(newValue);
-            }}
-          >
-            {customers &&
-              Array.isArray(customers) &&
-              customers.map((customer, indexIteration) => (
-                <Option key={indexIteration} value={customer.id}>
-                  {customer.name}
-                </Option>
-              ))}
-          </Select>
-        </Space>
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <Button
-            type="primary"
-            disabled={!customerSelected}
-            onClick={scaleIncident}
-          >
-            Escalar al area técnica
-          </Button>
-        </div>
-      </Modal>
+
+      <ModalScaleIncident
+        isOpen={isOpenModalEscale}
+        setIsOpen={setIsOpenModalEscale}
+        incidents={incidents}
+        incidentSelected={incidentSelected}
+        getIncidents={() => getIncidents(userData)}
+        id={id}
+        setIncidentSelected={setIncidentSelected}
+        customers={customers}
+      />
     </Fragment>
   );
 };
