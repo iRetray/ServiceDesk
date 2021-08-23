@@ -26,6 +26,20 @@ import ModalAddIssue from "../components/ModalAddIssue";
 import ModalScaleIncident from "../components/ModalScaleIncident";
 
 import AppService from "../services/AppService";
+import moment from "moment";
+import ModalComment from "../components/ModalComment";
+moment.updateLocale("es", {
+  months:
+    "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
+      "_"
+    ),
+  monthsShort:
+    "Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.".split("_"),
+  weekdays: "Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado".split("_"),
+  weekdaysShort: "Dom._Lun._Mar._Mier._Jue._Vier._Sab.".split("_"),
+  weekdaysMin: "Do_Lu_Ma_Mi_Ju_Vi_Sa".split("_"),
+});
+moment.locale("es");
 
 const { Title, Text } = Typography;
 
@@ -40,6 +54,13 @@ const HomeAdmin = ({ history }) => {
   const [id, setId] = useState(null);
 
   const [incidentSelected, setIncidentSelected] = useState(null);
+
+  const [modalComment, setModalComment] = useState({
+    issueID: "",
+    isOpen: false,
+    type: "",
+    finalFunction: () => {},
+  });
 
   useEffect(() => {
     doInitialValidation();
@@ -94,11 +115,21 @@ const HomeAdmin = ({ history }) => {
     });
   };
 
-  const markAsResolved = (issueID) => {
+  const launchModalResolved = (issueID) => {
+    setModalComment({
+      issueID: issueID,
+      isOpen: true,
+      type: "RESOLVED",
+      finalFunction: markAsResolved,
+    });
+  };
+
+  const markAsResolved = (issueID, comment) => {
     const issueSelected = {
       ...incidents.find((incident) => incident.id === issueID),
       status: "DISABLED",
       registerDate: "",
+      comment: comment,
     };
     AppService.saveNewIncident(issueSelected).then((response) => {
       const isSuccess = response && response.networkCode === 200;
@@ -122,14 +153,35 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "description",
       key: "description",
       align: "center",
-      width: "50%",
+      width: "25%",
+    },
+    {
+      title: "Comentario",
+      dataIndex: "comment",
+      key: "comment",
+      align: "center",
+      width: "10%",
+    },
+    {
+      title: "Fecha de creación",
+      dataIndex: "registerDate",
+      key: "registerDate",
+      align: "center",
+      width: "15%",
+      render: (registerDate) => (
+        <span>
+          <span>{moment(registerDate).format("MMMM DD YYYY")}</span>
+          <br />
+          <span>{moment(registerDate).format("h:mm a")}</span>
+        </span>
+      ),
     },
     {
       title: "Estado",
       dataIndex: "status",
       key: "status",
       align: "center",
-      width: "15%",
+      width: "10%",
       render: (state) =>
         state === "PENDING" ? (
           <Button
@@ -171,7 +223,7 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "15%",
+      width: "10%",
       render: (id) => {
         const currentIncident = incidents.find(
           (incident) => incident.id === id
@@ -182,6 +234,7 @@ const HomeAdmin = ({ history }) => {
               icon={<ArrowUpOutlined />}
               shape="round"
               style={{ color: "#003a8c", backgroundColor: "#1890ff" }}
+              disabled={currentIncident.levelScaled >= 2}
               onClick={() => {
                 setId(id);
                 AppService.getEmployeesByRol(
@@ -194,7 +247,6 @@ const HomeAdmin = ({ history }) => {
                   }
                 });
                 setIncidentSelected(currentIncident.incidentTypeId);
-
                 setIsOpenModalEscale(true);
               }}
             >
@@ -209,7 +261,7 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "15%",
+      width: "10%",
       render: (id) => {
         if (
           incidents.find((incident) => incident.id === id).status === "DISABLED"
@@ -231,7 +283,7 @@ const HomeAdmin = ({ history }) => {
               icon={<CheckOutlined />}
               style={{ color: "#135200", backgroundColor: "#52c41a" }}
               onClick={() => {
-                markAsResolved(id);
+                launchModalResolved(id);
               }}
             >
               Marcar como resuelto
@@ -374,6 +426,18 @@ const HomeAdmin = ({ history }) => {
         id={id}
         setIncidentSelected={setIncidentSelected}
         customers={customers}
+        enableSelector={false}
+        updateEmployees={null}
+      />
+
+      <ModalComment
+        issueID={modalComment.issueID}
+        isOpen={modalComment.isOpen}
+        closeModal={() =>
+          setModalComment({ isOpen: false, type: "", finalFunction: null })
+        }
+        type={modalComment.type}
+        finalFunction={modalComment.finalFunction}
       />
     </Fragment>
   );

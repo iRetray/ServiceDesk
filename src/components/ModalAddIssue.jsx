@@ -26,6 +26,7 @@ const ModalAddIssue = ({
     incidentTypeId: "",
     employeeId: "",
     customerId: "",
+    levelScaled: 0,
   });
 
   const [incidentsType, setIncidentsType] = useState(null);
