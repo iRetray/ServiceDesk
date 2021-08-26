@@ -204,7 +204,10 @@ const HomeUser = ({ history }) => {
         const currentIncident = incidents.find(
           (incident) => incident.id === id
         );
-        if (currentIncident.status === "SCALED") {
+        if (
+          currentIncident.status === "SCALED" ||
+          currentIncident.status === "ACTIVE"
+        ) {
           return (
             <Button
               icon={<ArrowUpOutlined />}

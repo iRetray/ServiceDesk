@@ -2,7 +2,7 @@ import axios from "axios";
 class AppService {
   constructor() {
     axios.defaults.baseURL =
-      "http://servicedeskdeploy-env.eba-egmyjwqv.us-east-2.elasticbeanstalk.com";
+      "http://servicedesk-env.eba-mv89qzjf.us-east-1.elasticbeanstalk.com";
   }
 
   sendGETRequest = (query) => {
@@ -58,6 +58,10 @@ class AppService {
 
   getEmployeesByRol = (rolId) => {
     return this.sendGETRequest("/employee/find-by-rol/?rolId=" + rolId);
+  };
+
+  saveComputerToPerson = (computerSpecs) => {
+    return this.sendPOSTRequest("/equipment/save", computerSpecs);
   };
 }
 

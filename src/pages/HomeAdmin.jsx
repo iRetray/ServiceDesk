@@ -19,6 +19,7 @@ import {
   PhoneTwoTone,
   LogoutOutlined,
   UserOutlined,
+  DesktopOutlined,
 } from "@ant-design/icons";
 
 import ModalAddNewUser from "../components/ModalAddNewUser";
@@ -28,6 +29,7 @@ import ModalScaleIncident from "../components/ModalScaleIncident";
 import AppService from "../services/AppService";
 import moment from "moment";
 import ModalComment from "../components/ModalComment";
+import ModalAddComputer from "../components/ModalAddComputer";
 moment.updateLocale("es", {
   months:
     "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
@@ -49,6 +51,7 @@ const HomeAdmin = ({ history }) => {
   const [isOpenModalUser, setIsOpenModalUser] = useState(false);
   const [isOpenModalIssue, setIsOpenModalIssue] = useState(false);
   const [isOpenModalEscale, setIsOpenModalEscale] = useState(false);
+  const [isOpenModalComputer, setIsOpenModalComputer] = useState(false);
 
   const [customers, setCustomers] = useState(null);
   const [id, setId] = useState(null);
@@ -228,7 +231,10 @@ const HomeAdmin = ({ history }) => {
         const currentIncident = incidents.find(
           (incident) => incident.id === id
         );
-        if (currentIncident.status === "PENDING") {
+        if (
+          currentIncident.status === "PENDING" ||
+          currentIncident.status === "ACTIVE"
+        ) {
           return (
             <Button
               icon={<ArrowUpOutlined />}
@@ -313,6 +319,16 @@ const HomeAdmin = ({ history }) => {
           </div>
 
           <div>
+            <Button
+              shape="round"
+              icon={<DesktopOutlined />}
+              style={{ marginRight: "10px" }}
+              onClick={() => {
+                setIsOpenModalComputer(true);
+              }}
+            >
+              Asignar equipo
+            </Button>
             <Button
               shape="round"
               icon={<UserAddOutlined />}
@@ -438,6 +454,11 @@ const HomeAdmin = ({ history }) => {
         }
         type={modalComment.type}
         finalFunction={modalComment.finalFunction}
+      />
+
+      <ModalAddComputer
+        isOpen={isOpenModalComputer}
+        setIsOpen={setIsOpenModalComputer}
       />
     </Fragment>
   );
