@@ -448,6 +448,7 @@ const HomeAdmin = ({ history }) => {
       />
 
       <ModalScaleIncident
+        isClient={false}
         isOpen={isOpenModalEscale}
         setIsOpen={setIsOpenModalEscale}
         incidents={incidents}
@@ -476,6 +477,7 @@ const HomeAdmin = ({ history }) => {
       />
 
       <ModalEditIssue
+        isClient={false}
         isOpen={isOpenModalEdit}
         setIsOpen={setIsOpenModalEdit}
         issueToEdit={issueToEdit}

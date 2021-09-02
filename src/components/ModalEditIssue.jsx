@@ -5,12 +5,18 @@ import AppService from "../services/AppService";
 
 const { TextArea } = Input;
 
-const ModalEditIssue = ({ isOpen, setIsOpen, issueToEdit, getIncidents }) => {
+const ModalEditIssue = ({
+  isClient,
+  isOpen,
+  setIsOpen,
+  issueToEdit,
+  getIncidents,
+}) => {
   const [preDiag, setPreDiag] = useState("");
   const [indagacion, setIndagacion] = useState();
+  const [attentionIncident, setAttentionIncident] = useState("");
 
   useEffect(() => {
-    console.log("here");
     setPreDiag(issueToEdit?.preDiagnosis);
     setIndagacion(issueToEdit?.inquiry);
   }, [isOpen]);
@@ -20,6 +26,7 @@ const ModalEditIssue = ({ isOpen, setIsOpen, issueToEdit, getIncidents }) => {
       ...issueToEdit,
       preDiagnosis: preDiag,
       inquiry: indagacion,
+      attentionIncident,
     }).then((response) => {
       const isSuccess = response && response.networkCode === 200;
       if (isSuccess) {
@@ -80,6 +87,20 @@ const ModalEditIssue = ({ isOpen, setIsOpen, issueToEdit, getIncidents }) => {
             }}
           />
         </Space>
+        {isClient && (
+          <Space style={{ marginTop: "15px" }}>
+            <span>Atención al incidente:</span>
+            <TextArea
+              rows={2}
+              style={{ width: "300px" }}
+              placeholder="Comentario para la Atención al incidente"
+              value={attentionIncident}
+              onChange={(newValue) => {
+                setAttentionIncident(newValue.target.value);
+              }}
+            />
+          </Space>
+        )}
         <div style={{ textAlign: "center", marginTop: "20px" }}>
           <Button type="primary" onClick={updateIssue}>
             Guardar

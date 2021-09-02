@@ -8,6 +8,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const ModalScaleIncident = ({
+  isClient,
   isOpen,
   setIsOpen,
   incidents,
@@ -24,6 +25,7 @@ const ModalScaleIncident = ({
   const [comment, setComment] = useState("");
   const [preDiag, setPreDiag] = useState("");
   const [indagacion, setIndagacion] = useState();
+  const [attentionIncident, setAttentionIncident] = useState("");
 
   const [selectedType, setSelectedType] = useState("");
 
@@ -43,7 +45,6 @@ const ModalScaleIncident = ({
 
   const scaleIncident = () => {
     const currentIncident = incidents.find((incident) => incident.id === id);
-    console.log(currentIncident);
     const issueSelected = {
       ...currentIncident,
       status: "SCALED",
@@ -56,6 +57,7 @@ const ModalScaleIncident = ({
       levelScaled: currentIncident.levelScaled + 1,
       preDiagnosis: preDiag,
       inquiry: indagacion,
+      attentionIncident,
     };
     AppService.saveNewIncident(issueSelected).then((response) => {
       const isSuccess = response && response.networkCode === 200;
@@ -155,6 +157,20 @@ const ModalScaleIncident = ({
             }}
           />
         </Space>
+        {isClient && (
+          <Space style={{ marginTop: "15px" }}>
+            <span>Atención al incidente:</span>
+            <TextArea
+              rows={2}
+              style={{ width: "300px" }}
+              placeholder="Comentario para la Atención al incidente"
+              value={attentionIncident}
+              onChange={(newValue) => {
+                setAttentionIncident(newValue.target.value);
+              }}
+            />
+          </Space>
+        )}
         <center>
           <TextArea
             rows={4}

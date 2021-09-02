@@ -17,10 +17,12 @@ import {
   ArrowUpOutlined,
   SettingTwoTone,
   LogoutOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 
 import ModalAddNewUser from "../components/ModalAddNewUser";
 import ModalScaleIncident from "../components/ModalScaleIncident";
+import ModalEditIssue from "../components/ModalEditIssue";
 
 import AppService from "../services/AppService";
 
@@ -45,6 +47,9 @@ const HomeUser = ({ history }) => {
   const [pendings, setPendings] = useState(null);
   const [incidents, setIncidents] = useState(null);
   const [isOpenModalUser, setIsOpenModalUser] = useState(false);
+
+  const [isOpenModalEdit, setIsOpenModalEdit] = useState(false);
+  const [issueToEdit, setIssueToEdit] = useState(null);
 
   const [customers, setCustomers] = useState(null);
   const [id, setId] = useState(null);
@@ -122,28 +127,36 @@ const HomeUser = ({ history }) => {
       dataIndex: "customerName",
       key: "customerName",
       align: "center",
-      width: "20%",
     },
     {
       title: "Descripción",
       dataIndex: "description",
       key: "description",
       align: "center",
-      width: "50%",
     },
     {
       title: "Comentario",
       dataIndex: "comment",
       key: "comment",
       align: "center",
-      width: "10%",
+    },
+    {
+      title: "Indagación",
+      dataIndex: "inquiry",
+      key: "inquiry",
+      align: "center",
+    },
+    {
+      title: "Prediagnóstico",
+      dataIndex: "preDiagnosis",
+      key: "preDiagnosis",
+      align: "center",
     },
     {
       title: "Fecha de creación",
       dataIndex: "registerDate",
       key: "registerDate",
       align: "center",
-      width: "15%",
       render: (registerDate) => (
         <span>
           <span>{moment(registerDate).format("MMMM DD YYYY")}</span>
@@ -157,7 +170,6 @@ const HomeUser = ({ history }) => {
       dataIndex: "status",
       key: "status",
       align: "center",
-      width: "15%",
       render: (state) =>
         state === "PENDING" ? (
           <Button
@@ -199,7 +211,6 @@ const HomeUser = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "10%",
       render: (id) => {
         const currentIncident = incidents.find(
           (incident) => incident.id === id
@@ -241,7 +252,6 @@ const HomeUser = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "15%",
       render: (id) => {
         if (
           incidents.find((incident) => incident.id === id).status === "DISABLED"
@@ -270,6 +280,23 @@ const HomeUser = ({ history }) => {
             </Button>
           );
         }
+      },
+    },
+    {
+      title: "Editar",
+      align: "center",
+      dataIndex: "id",
+      render: (id, object) => {
+        return (
+          <Button
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setIssueToEdit(object);
+              setIsOpenModalEdit(true);
+            }}
+          />
+        );
       },
     },
   ];
@@ -351,6 +378,7 @@ const HomeUser = ({ history }) => {
       />
 
       <ModalScaleIncident
+        isClient={true}
         isOpen={isOpenModalEscale}
         setIsOpen={setIsOpenModalEscale}
         incidents={incidents}
@@ -361,6 +389,14 @@ const HomeUser = ({ history }) => {
         customers={customers}
         enableSelector={true}
         updateEmployees={updateEmployees}
+      />
+
+      <ModalEditIssue
+        isClient={true}
+        isOpen={isOpenModalEdit}
+        setIsOpen={setIsOpenModalEdit}
+        issueToEdit={issueToEdit}
+        getIncidents={() => getIncidents(userData)}
       />
     </Fragment>
   );
