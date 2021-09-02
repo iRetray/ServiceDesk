@@ -22,6 +22,8 @@ const ModalScaleIncident = ({
   const [customerSelected, setCustomerSelected] = useState(null);
   const [incidentsType, setIncidentsType] = useState(null);
   const [comment, setComment] = useState("");
+  const [preDiag, setPreDiag] = useState("");
+  const [indagacion, setIndagacion] = useState();
 
   const [selectedType, setSelectedType] = useState("");
 
@@ -52,6 +54,8 @@ const ModalScaleIncident = ({
         : incidentSelected,
       comment: comment,
       levelScaled: currentIncident.levelScaled + 1,
+      preDiagnosis: preDiag,
+      inquiry: indagacion,
     };
     AppService.saveNewIncident(issueSelected).then((response) => {
       const isSuccess = response && response.networkCode === 200;
@@ -126,6 +130,30 @@ const ModalScaleIncident = ({
                 </Option>
               ))}
           </Select>
+        </Space>
+        <Space style={{ marginTop: "15px" }}>
+          <span>Prediagnóstico:</span>
+          <TextArea
+            rows={2}
+            style={{ width: "300px" }}
+            placeholder="Comentario para el prediagnóstico"
+            value={preDiag}
+            onChange={(newValue) => {
+              setPreDiag(newValue.target.value);
+            }}
+          />
+        </Space>
+        <Space style={{ marginTop: "15px" }}>
+          <span>Indagación:</span>
+          <TextArea
+            rows={2}
+            style={{ width: "300px" }}
+            placeholder="Comentario para la indagación"
+            value={indagacion}
+            onChange={(newValue) => {
+              setIndagacion(newValue.target.value);
+            }}
+          />
         </Space>
         <center>
           <TextArea

@@ -20,6 +20,7 @@ import {
   LogoutOutlined,
   UserOutlined,
   DesktopOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 
 import ModalAddNewUser from "../components/ModalAddNewUser";
@@ -30,6 +31,7 @@ import AppService from "../services/AppService";
 import moment from "moment";
 import ModalComment from "../components/ModalComment";
 import ModalAddComputer from "../components/ModalAddComputer";
+import ModalEditIssue from "../components/ModalEditIssue";
 moment.updateLocale("es", {
   months:
     "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
@@ -52,6 +54,8 @@ const HomeAdmin = ({ history }) => {
   const [isOpenModalIssue, setIsOpenModalIssue] = useState(false);
   const [isOpenModalEscale, setIsOpenModalEscale] = useState(false);
   const [isOpenModalComputer, setIsOpenModalComputer] = useState(false);
+  const [isOpenModalEdit, setIsOpenModalEdit] = useState(false);
+  const [issueToEdit, setIssueToEdit] = useState(null);
 
   const [customers, setCustomers] = useState(null);
   const [id, setId] = useState(null);
@@ -149,28 +153,24 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "customerName",
       key: "customerName",
       align: "center",
-      width: "20%",
     },
     {
       title: "Descripción",
       dataIndex: "description",
       key: "description",
       align: "center",
-      width: "25%",
     },
     {
       title: "Comentario",
       dataIndex: "comment",
       key: "comment",
       align: "center",
-      width: "10%",
     },
     {
       title: "Fecha de creación",
       dataIndex: "registerDate",
       key: "registerDate",
       align: "center",
-      width: "15%",
       render: (registerDate) => (
         <span>
           <span>{moment(registerDate).format("MMMM DD YYYY")}</span>
@@ -184,7 +184,6 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "status",
       key: "status",
       align: "center",
-      width: "10%",
       render: (state) =>
         state === "PENDING" ? (
           <Button
@@ -226,7 +225,6 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "10%",
       render: (id) => {
         const currentIncident = incidents.find(
           (incident) => incident.id === id
@@ -267,7 +265,6 @@ const HomeAdmin = ({ history }) => {
       dataIndex: "id",
       key: "id",
       align: "center",
-      width: "10%",
       render: (id) => {
         if (
           incidents.find((incident) => incident.id === id).status === "DISABLED"
@@ -296,6 +293,23 @@ const HomeAdmin = ({ history }) => {
             </Button>
           );
         }
+      },
+    },
+    {
+      title: "Editar",
+      align: "center",
+      dataIndex: "id",
+      render: (id, object) => {
+        return (
+          <Button
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setIssueToEdit(object);
+              setIsOpenModalEdit(true);
+            }}
+          />
+        );
       },
     },
   ];
@@ -459,6 +473,13 @@ const HomeAdmin = ({ history }) => {
       <ModalAddComputer
         isOpen={isOpenModalComputer}
         setIsOpen={setIsOpenModalComputer}
+      />
+
+      <ModalEditIssue
+        isOpen={isOpenModalEdit}
+        setIsOpen={setIsOpenModalEdit}
+        issueToEdit={issueToEdit}
+        getIncidents={() => getIncidents(userData)}
       />
     </Fragment>
   );
