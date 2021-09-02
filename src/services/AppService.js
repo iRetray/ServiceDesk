@@ -62,6 +62,15 @@ class AppService {
   saveComputerToPerson = (computerSpecs) => {
     return this.sendPOSTRequest("/equipment/save", computerSpecs);
   };
+
+  getGraphInformation = (initialDate, finalDate) => {
+    return this.sendGETRequest(
+      "/report/find-all-by-date?initialDate=" +
+        initialDate +
+        "&finalDate=" +
+        finalDate
+    );
+  };
 }
 
 const myService = new AppService();

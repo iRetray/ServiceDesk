@@ -6,7 +6,7 @@ import esES from "antd/lib/locale-provider/es_ES";
 import Login from "./pages/Login";
 import HomeAdmin from "./pages/HomeAdmin";
 import HomeUser from "./pages/HomeUser";
-import NewIssue from "./pages/NewIssue";
+import HomeGraphs from "./pages/HomeGraphs";
 
 import "antd/dist/antd.css";
 import "./styles/styles.scss";
@@ -20,7 +20,7 @@ const ServiceDesk = () => {
           <Route exact path="/login" component={Login} />
           <Route exact path="/homeAdmin" component={HomeAdmin} />
           <Route exact path="/homeUser" component={HomeUser} />
-          <Route exact path="/newIssue" component={NewIssue} />
+          <Route exact path="/homeGraphs" component={HomeGraphs} />
         </Switch>
       </BrowserRouter>
     </ConfigProvider>

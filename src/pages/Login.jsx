@@ -27,7 +27,11 @@ const Login = ({ history }) => {
       if (isSuccess) {
         history.push({
           pathname:
-            response.rolId === "CALL_CENTER" ? "/homeAdmin" : "homeUser",
+            response.rolId === "CALL_CENTER"
+              ? "/homeAdmin"
+              : response.rolId === "ADMINISTRADOR"
+              ? "/homeGraphs"
+              : "/homeUser",
           state: {
             user: response,
           },
