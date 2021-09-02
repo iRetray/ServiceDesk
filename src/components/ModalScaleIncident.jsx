@@ -94,7 +94,9 @@ const ModalScaleIncident = ({
                   ? selectedType
                   : incidents?.find((incident) => incident.id === id)
                       ?.incidentTypeId
-                : null
+                : incidentsType?.find(
+                    (oneType) => oneType.name === incidentSelected
+                  )?.id
             }
             disabled={!enableSelector}
           >

@@ -1,8 +1,7 @@
 import axios from "axios";
 class AppService {
   constructor() {
-    axios.defaults.baseURL =
-      "http://servicedesk-env.eba-mv89qzjf.us-east-1.elasticbeanstalk.com";
+    axios.defaults.baseURL = "https://service-desk-324604.uc.r.appspot.com";
   }
 
   sendGETRequest = (query) => {
