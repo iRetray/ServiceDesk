@@ -139,7 +139,7 @@ const ModalScaleIncident = ({
             disabled={enableSelector}
             value={
               enableSelector
-                ? incidents.find((inc) => (inc.id = id)).preDiagnosis
+                ? incidents?.find((inc) => (inc.id = id))?.preDiagnosis
                 : preDiag
             }
             rows={2}
@@ -159,7 +159,7 @@ const ModalScaleIncident = ({
             placeholder="Comentario para la indagación"
             value={
               enableSelector
-                ? incidents.find((inc) => (inc.id = id)).inquiry
+                ? incidents?.find((inc) => (inc.id = id))?.inquiry
                 : indagacion
             }
             onChange={(newValue) => {
