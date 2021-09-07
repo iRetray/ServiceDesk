@@ -67,6 +67,7 @@ const ModalEditIssue = ({
         <Space style={{ marginTop: "15px" }}>
           <span>Prediagnóstico:</span>
           <TextArea
+            disabled={isClient}
             rows={2}
             style={{ width: "300px" }}
             placeholder="Comentario para el prediagnóstico"
@@ -79,6 +80,7 @@ const ModalEditIssue = ({
         <Space style={{ marginTop: "15px" }}>
           <span>Indagación:</span>
           <TextArea
+            disabled={isClient}
             rows={2}
             style={{ width: "300px" }}
             placeholder="Comentario para la indagación"

@@ -136,10 +136,15 @@ const ModalScaleIncident = ({
         <Space style={{ marginTop: "15px" }}>
           <span>Prediagnóstico:</span>
           <TextArea
+            disabled={enableSelector}
+            value={
+              enableSelector
+                ? incidents.find((inc) => (inc.id = id)).preDiagnosis
+                : preDiag
+            }
             rows={2}
             style={{ width: "300px" }}
             placeholder="Comentario para el prediagnóstico"
-            value={preDiag}
             onChange={(newValue) => {
               setPreDiag(newValue.target.value);
             }}
@@ -148,10 +153,15 @@ const ModalScaleIncident = ({
         <Space style={{ marginTop: "15px" }}>
           <span>Indagación:</span>
           <TextArea
+            disabled={enableSelector}
             rows={2}
             style={{ width: "300px" }}
             placeholder="Comentario para la indagación"
-            value={indagacion}
+            value={
+              enableSelector
+                ? incidents.find((inc) => (inc.id = id)).inquiry
+                : indagacion
+            }
             onChange={(newValue) => {
               setIndagacion(newValue.target.value);
             }}

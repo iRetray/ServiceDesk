@@ -27,6 +27,7 @@ import ModalEditIssue from "../components/ModalEditIssue";
 import AppService from "../services/AppService";
 
 import moment from "moment";
+import ModalResolve from "../components/ModalResolve";
 moment.updateLocale("es", {
   months:
     "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
@@ -57,6 +58,9 @@ const HomeUser = ({ history }) => {
   const [incidentSelected, setIncidentSelected] = useState(null);
 
   const [isOpenModalEscale, setIsOpenModalEscale] = useState(false);
+
+  const [isOpenModalResolved, setIsOpenModalResolved] = useState(false);
+  const [idResolve, setIdResolve] = useState("");
 
   useEffect(() => {
     doInitialValidation();
@@ -96,11 +100,12 @@ const HomeUser = ({ history }) => {
     );
   };
 
-  const markAsResolved = (issueID) => {
+  const markAsResolved = (issueID, attentionIncident) => {
     const issueSelected = {
       ...incidents.find((incident) => incident.id === issueID),
       status: "DISABLED",
       registerDate: "",
+      attentionIncident: attentionIncident,
     };
     AppService.saveNewIncident(issueSelected).then((response) => {
       const isSuccess = response && response.networkCode === 200;
@@ -150,6 +155,12 @@ const HomeUser = ({ history }) => {
       title: "Prediagnóstico",
       dataIndex: "preDiagnosis",
       key: "preDiagnosis",
+      align: "center",
+    },
+    {
+      title: "Atención al incidente",
+      dataIndex: "attentionIncident",
+      key: "attentionIncident",
       align: "center",
     },
     {
@@ -273,7 +284,8 @@ const HomeUser = ({ history }) => {
               icon={<CheckOutlined />}
               style={{ color: "#135200", backgroundColor: "#52c41a" }}
               onClick={() => {
-                markAsResolved(id);
+                setIdResolve(id);
+                setIsOpenModalResolved(true);
               }}
             >
               Marcar como resuelto
@@ -371,12 +383,10 @@ const HomeUser = ({ history }) => {
         </div>
         <div style={{ height: "50px" }} />
       </div>
-
       <ModalAddNewUser
         isOpen={isOpenModalUser}
         setIsOpen={setIsOpenModalUser}
       />
-
       <ModalScaleIncident
         isClient={true}
         isOpen={isOpenModalEscale}
@@ -390,13 +400,18 @@ const HomeUser = ({ history }) => {
         enableSelector={true}
         updateEmployees={updateEmployees}
       />
-
       <ModalEditIssue
         isClient={true}
         isOpen={isOpenModalEdit}
         setIsOpen={setIsOpenModalEdit}
         issueToEdit={issueToEdit}
         getIncidents={() => getIncidents(userData)}
+      />
+      <ModalResolve
+        isOpen={isOpenModalResolved}
+        setIsOpen={setIsOpenModalResolved}
+        id={idResolve}
+        markAsResolved={markAsResolved}
       />
     </Fragment>
   );
